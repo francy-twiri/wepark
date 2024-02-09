@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Mobile-Friendly Map</title>
+	<script src="https://kit.fontawesome.com/c63faa1f51.js" crossorigin="anonymous"></script>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Google Maps API Script -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&callback=initMap" async defer></script>
+
+    <style>
+        /* Adjust map container height */
+		body,html{
+			overflow: hidden;
+			text-align:center;
+			
+		}
+        #map {
+		  height: 384px;
+		  width: 100%;
+		  
+		  position:absolute;
+		  top: 0;
+		  left: 0;
+		  z-index: 0; 
+		}
+		
+		.downfall{
+			position:absolute;
+			bottom:-.9%;
+			left: 1%;
+			width: 102%;
+			height:calc(100vh - 400px);
+			border: 1px solid black
+			box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+			background: white;
+			border-radius: 24px;
+			display: flex;
+			text-align:center;
+		}
+		@media only screen and (min-width: 600px) {
+			#map {
+				width: 70%;
+				left: 15%;
+			}
+			body{
+				width: 80%;
+				margin: 1% auto;
+			}
+		}
+		.search-downfall{
+			width:89%;
+			margin-left: 5%;
+			margin-top: 4%;
+			padding: 6px;
+			background: #ddd;
+		}
+		.location{
+			position: absolute;
+			right: 2.5%;
+			bottom: 120%;
+			z-index: 2;
+			padding: 0 5px;
+			font-family: Roboto,Arial,sans-serif;
+			
+			border-radius: 36px;
+			box-shadow: 0 2px 6px rgba(0,0,0,.3);
+			border: 2px #fff solid;
+			cursor: pointer;
+			lineheight: 38px;
+			background: white;
+			
+		}
+		#searchmap{
+			visibility: hidden;
+			width: 95%;
+			margin-left: 5%;
+		}
+		.location-menu{display:flex;flex-direction:column;width: 80%;}
+		.location-menu li{
+			width: 100%;
+			flex: auto;
+			
+			cursor: pointer;
+			display: block;
+			text-align:left;
+			font-size: 19px;
+			margin-top: 9px;
+			font-family: Roboto,Arial,sans-serif;
+		}
+		.location-menu li:hover{background: #ddd;}
+		.description{
+			font-size: 14px;
+		}
+		.navbutton{
+			position: fixed;
+			top: 2%;
+			left: 2%;
+			z-index: 4;
+			background: none;
+			height: 65px;
+			border-radius: 50%;
+		}
+		.navbutton button{
+			background: white;
+		}
+    </style>
+</head>
+<body>
+<!-- Just an image -->
+<nav class="navbutton">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"><i class="fa-solid fa-bars"></i></span>
+    </button>
+ </nav>
+<div class="container mt-4">
+	
+    <div id="map"></div>
+	<div class="row downfall" id="downfall">
+		<button class="location" id="centermap"><i class="fa-solid fa-location-crosshairs"></i></button>
+		<div class="" style="width: 100%;">
+			<input type="text" class="form-control search-downfall" id="search-downfall" placeholder="Parking Location">
+			<ul class="location-menu">
+				<li class="location-item">
+					<a>Location Names</a><br>
+					<span class="description">description</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<script>
+function createCenterControl(map) {
+  const controlButton = document.createElement('input');
+
+  // Set CSS for the control.
+  controlButton.style.backgroundColor = '#fff';
+  controlButton.style.border = '2px solid #fff';
+  controlButton.style.borderRadius = '3px';
+  controlButton.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  controlButton.style.color = 'rgb(25,25,25)';
+  controlButton.style.cursor = 'pointer';
+  controlButton.style.fontFamily = 'Roboto,Arial,sans-serif';
+  controlButton.style.fontSize = '16px';
+  controlButton.style.lineHeight = '38px';
+  controlButton.style.margin = '8px 0 22px';
+  controlButton.style.padding = '0 75px';
+  controlButton.style.textAlign = 'center';
+
+  controlButton.placeholder = 'Search Location';
+  controlButton.title = 'Click to recenter the map';
+  controlButton.type = 'text';
+  controlButton.id = 'searchmap';
+
+  // Setup the click event listeners: simply set the map to Chicago.
+  controlButton.addEventListener('click', () => {
+    map.setCenter(chicago);
+  });
+
+  return controlButton;
+}
+	var map,location_marker
+	const coords = [{},{}]
+
+	function success(pos) {
+	  const crd = pos.coords;
+
+	  console.log("Your current position is:");
+	  console.log(`Latitude : ${crd.latitude}`);
+	  console.log(`Longitude: ${crd.longitude}`);
+	  console.log(`More or less ${crd.accuracy} meters.`);
+	  map.setCenter({lat: crd.latitude,lng:crd.longitude})
+	  location_marker.setPosition({lat: crd.latitude,lng:crd.longitude})
+	  coords[0] = {lat: crd.latitude,lng:crd.longitude}
+	}
+		
+	const options = {
+	  enableHighAccuracy: true,
+	  timeout: 5000,
+	  maximumAge: 0,
+	};
+	const locations = [
+		{lat: -1.397, lng: 36.644 },
+		{lat: -1.347, lng: 32.644 },
+		{lat: -1.4, lng: 37.644},
+	]
+	
+	function error(err) {
+	  console.warn(`ERROR(${err.code}): ${err.message}`);
+	}
+	
+    function initMap() {
+        // Replace with your coordinates
+        var myLatLng = {lat: -1.397, lng: 36.644};
+
+        // Create a map object and specify the DOM element for display.
+        map = new google.maps.Map(document.getElementById('map'), 
+			
+		{
+            center: myLatLng,
+            zoom: 15,
+			disableDefaultUI: true,
+			mapTypeId: google.maps.MapTypeId.ROADMAP  
+        });
+		
+		directionsService = new google.maps.DirectionsService,
+		directionsDisplay = new google.maps.DirectionsRenderer({
+		  map: map
+		}),
+
+        // Create a marker and set its position.
+        location_marker = new google.maps.Marker({
+            map: map,
+            position: myLatLng,
+			//icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/parking_lot_maps.png",
+            title: 'Hello World!'
+        });
+		
+		for(var position of locations){
+			var mk = new google.maps.Marker({
+				map: map,
+				position: position,
+				icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/parking_lot_maps.png",
+				//title: 'Hello World!'
+			});
+			mk.addListener("click",function(e){
+				var lat = e.latLng.lat()
+				var lng = e.latLng.lng()
+				
+				coords[1] = {lat: lat,lng:lng}
+				directionsService.route({
+					origin: coords[0],
+					destination: coords[1],
+					travelMode: google.maps.TravelMode.DRIVING
+				  }, function(response, status) {
+					if (status == google.maps.DirectionsStatus.OK) {
+					  directionsDisplay.setDirections(response);
+					} else {
+					  window.alert('Directions request failed due to ' + status);
+					}
+				  });
+			})
+			
+		}
+		const centerControlDiv = document.createElement('div');
+		  // Create the control.
+		  const centerControl = createCenterControl(map);
+		  // Append the control to the DIV.
+		  centerControlDiv.appendChild(centerControl);
+		document.getElementById("centermap").addEventListener("click",function(e){
+			navigator.geolocation.getCurrentPosition(success, error, options);
+		})
+		document.getElementById("search-downfall").addEventListener("click",function(e){
+			document.getElementById("searchmap").style.visibility = "visible"
+			document.getElementById("centermap").setAttribute("style","display:none;")
+			document.getElementById("downfall").setAttribute("style","height:91vh;")
+			document.getElementById("search-downfall").setAttribute("style","display:none;")
+		})
+		map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+		centerControl.addEventListener("keyup",function(e){
+		
+			if(e.target.value.length == 0){
+				document.getElementById("search-downfall").removeAttribute("style")
+				document.getElementById("centermap").removeAttribute("style")
+			}
+			document.getElementById("downfall").removeAttribute("style")
+		})
+    }
+
+
+	navigator.geolocation.getCurrentPosition(success, error, options);
+</script>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-Xj12IoaujEaHJ5ggC4XorSRlna+EidHR2L9U2xuJYd21dOUUGaVpQkoI+W+XZZT5" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+WyLnxmIkMsj21g6S8SSPhpGNVMchNRZQ"
+
+crossorigin="anonymous"></script>
+
+</body>
+</html>
