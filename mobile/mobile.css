@@ -1,0 +1,115 @@
+.menu-toggle {
+			font-size: 24px;
+			cursor: pointer;
+			padding: 10px;
+			position: fixed;
+			top: 0;
+			left: 5px;
+			z-index: 100;
+			color: black;
+			background: white;
+			border-radius: 46%;
+		}
+.menu {
+    display: none;
+	
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: rgb(219, 215, 215);
+    z-index: 1;
+}
+
+.menu ul {
+    list-style: none;
+	left: 5%;
+    
+    
+}
+
+.menu ul li {
+    margin: 15px 0;
+	left: 1%;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    color: black;
+	font-weight: 600;
+	float: left;
+}
+.profile{
+	position: relative;
+	width: 100%;
+	height: 20vh;
+	background: white;
+	box-shadow: 0 2px 6px rgba(0,0,0,.3);
+	border-radius: 3%;
+
+}
+.fas {
+	position: absolute;
+	top: 30px;
+    left: 20px;
+    display: grid;
+    place-items: center;
+	
+	width: 40px;
+	height: 40px;
+	background: #dad3d3;
+	box-shadow: 0 2px 6px rgba(0,0,0,.3);
+	border-radius: 40%;
+	
+	
+
+}
+.details{
+	position: absolute;
+	left: 75px;
+	top:19px;
+	cursor: pointer;
+}
+.payment-container{
+	margin-top: -5%;
+	display: flex;	
+	width: 100%;
+	min-height: 40vh;
+	background: white;
+	box-shadow: 0 2px 6px rgba(0,0,0,.3);
+	border-radius: 3%;
+	text-align: left;
+}
+.payment-container ul{
+	width: 100%;
+	display: block;
+	text-align: left;
+}
+.payment-container ul li{
+	height: 38px;
+	margin-left:-10%; 
+}
+.payment-container ul li:hover{
+	cursor: pointer;
+	background-color: #ddd;
+}
+.empty{
+	margin-top: -5%;
+	
+	width: 100%;
+	height: 70vh;
+	background: white;
+	box-shadow: 0 2px 6px rgba(0,0,0,.3);
+	border-radius: 3%;
+
+
+}
+@media (min-width: 600px) {
+	.menu{
+		width: 28%;
+	}
+	.payment-container, .empty{
+		margin-top: -4%;
+	}
+}
